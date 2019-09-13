@@ -1,2 +1,133 @@
 ---
 # tasks file for ansible-role-azure-vm
+- name: try to set a unique storageaccount name
+  set_fact:
+    storageaccount_name: "{{ azure_vm_resource_group }}{{ 10000000 |random}}"
+
+- name: Create the resource group
+  azure_rm_resourcegroup:
+    name: "{{ azure_vm_resource_group }}"
+    location: "{{ azure_vm_location }}"
+
+- name: Create a storage account
+  azure_rm_storageaccount:
+    resource_group: "{{ azure_vm_resource_group }}"
+    name: "{{ azure_vm_storageaccount_name }}"
+    type: "{{ azure_vm_storage_type }}"
+
+- name: Create virtual network
+  azure_rm_virtualnetwork:
+    resource_group: "{{ azure_vm_resource_group }}"
+    name: "{{ azure_vm_resource_group }}-vnet"
+    address_prefixes: "10.0.0.0/16"
+
+- name: Add subnet
+  azure_rm_subnet:
+    resource_group: "{{ azure_vm_resource_group }}"
+    name: default
+    address_prefix: "10.0.1.0/24"
+    virtual_network: "{{ azure_vm_resource_group }}-vnet"
+
+- name: Create public IPs
+  azure_rm_publicipaddress:
+    resource_group: "{{ azure_vm_resource_group }}"
+    allocation_method: Static
+    name: "{{ azure_vm_vm_prefix }}{{ item }}-pubip"
+  with_sequence: start=1 end={{num_vm|int}}
+  async: 1000
+  poll: 0
+  register: publicip
+
+- name: "Check Public IPs Created"
+  async_status:
+    jid: "{{ item.ansible_job_id }}"
+  register: publicip_status
+  until: publicip_status.finished
+  retries: 500
+  delay: 4
+  with_items: "{{ publicip.results }}"
+
+- name: Get facts for all Public IPs
+  azure_rm_publicipaddress_facts:
+    resource_group: "{{ azure_vm_resource_group }}"
+  register: output_ip_address
+
+- name: Show Public IP address
+  debug:
+    msg: "{{ item.properties.ipAddress }}"
+  with_items: "{{ output_ip_address.ansible_facts.azure_publicipaddresses }}"
+
+- name: Store Public IPs in list
+  set_fact:
+    public_ips: "{{ foo }} + [ '{{ item }}' ]"
+  with_items: "{{ output_ip_address.ansible_facts.azure_publicipaddresses }}"
+
+- name: Create Network Security Group that allows SSH/Cockpit
+  azure_rm_securitygroup:
+    resource_group: "{{ azure_vm_resource_group }}"
+    name: "{{ azure_vm_resource_group }}-nsg"
+    rules:
+      - name: SSH
+        protocol: Tcp
+        destination_port_range: 22
+        access: Allow
+        priority: 101
+        direction: Inbound
+      - name: COCKPIT
+        protocol: Tcp
+        destination_port_range: 9090
+        access: Allow
+        priority: 102
+        direction: Inbound
+
+- name: Create virtual network inteface card
+  azure_rm_networkinterface:
+    resource_group: "{{ azure_vm_resource_group }}"
+    name: "{{ azure_vm_vm_prefix }}{{ item }}-Nic"
+    virtual_network: "{{ azure_vm_resource_group }}-vnet"
+    subnet: default
+    public_ip_name: "{{ azure_vm_vm_prefix }}{{ item }}-pubip"
+    security_group: "{{ azure_vm_resource_group }}-nsg"
+  with_sequence: start=1 end={{num_vm|int}}
+  async: 1000
+  poll: 0
+  register: nic
+
+- name: "Check Nic Created"
+  async_status:
+    jid: "{{ item.ansible_job_id }}"
+  register: nic_status
+  until: nic_status.finished
+  retries: 500
+  delay: 4
+  with_items: "{{ nic.results }}"
+
+- name: Create VM
+  azure_rm_virtualmachine:
+    resource_group: "{{ azure_vm_resource_group }}"
+    name: "{{ azure_vm_vm_prefix }}{{ item }}"
+    vm_size: "{{ vm_size }}"
+    managed_disk_type: "{{ os_disk_type }}"
+    storage_account_name: "{{ azure_vm_storageaccount_name }}"
+    admin_username: "{{ admin_username }}"
+    ssh_password_enabled: false
+    ssh_public_keys:
+      - path: "/home/{{ admin_username }}/.ssh/authorized_keys"
+        key_data: "{{ ssh_pub_key }}"
+    network_interfaces: "{{ azure_vm_vm_prefix }}{{ item }}-Nic"
+    image: "{{ image }}"
+    tags: "{{ azure_vm_tags }}"
+      - env: testing
+  with_sequence: start=1 end={{num_vm|int}}
+  async: 1000
+  poll: 0
+  register: vm
+
+- name: "Check VM Created"
+  async_status:
+    jid: "{{ item.ansible_job_id }}"
+  register: vm_status
+  until: vm_status.finished
+  retries: 500
+  delay: 4
+  with_items: "{{ vm.results }}"
