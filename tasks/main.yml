@@ -110,8 +110,8 @@
   azure_rm_virtualmachine:
     resource_group: "{{ azure_vm_resource_group }}"
     name: "{{ azure_vm_vm_prefix }}{{ item }}"
-    vm_size: "{{ vm_size }}"
-    managed_disk_type: "{{ os_disk_type }}"
+    vm_size: "{{ azure_vm_vm_size }}"
+    managed_disk_type: "{{ azure_vm_os_disk_type }}"
     storage_account_name: "{{ azure_vm_storageaccount_name }}"
     admin_username: "{{ azure_vm_admin_username }}"
     ssh_password_enabled: false
