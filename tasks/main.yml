@@ -113,7 +113,7 @@
     vm_size: "{{ vm_size }}"
     managed_disk_type: "{{ os_disk_type }}"
     storage_account_name: "{{ azure_vm_storageaccount_name }}"
-    admin_username: "{{ admin_username }}"
+    admin_username: "{{ azure_vm_admin_username }}"
     ssh_password_enabled: false
     ssh_public_keys:
       - path: "/home/{{ admin_username }}/.ssh/authorized_keys"
