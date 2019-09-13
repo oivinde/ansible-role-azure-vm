@@ -57,6 +57,10 @@
     msg: "{{ item.properties.ipAddress }}"
   with_items: "{{ output_ip_address.ansible_facts.azure_publicipaddresses }}"
 
+- name: Initialize an empty list for our Public IPS
+  set_fact:
+    public_ips: []
+
 - name: Store Public IPs in list
   set_fact:
     public_ips: "{{ public_ips }} + [ '{{ item }}' ]"
