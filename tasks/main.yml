@@ -33,7 +33,7 @@
     resource_group: "{{ azure_vm_resource_group }}"
     allocation_method: Static
     name: "{{ azure_vm_vm_prefix }}{{ item }}-pubip"
-  with_sequence: start=1 end={{num_vm|int}}
+  with_sequence: start=1 end={{azure_vm_num_vm|int}}
   async: 1000
   poll: 0
   register: publicip
@@ -88,7 +88,7 @@
     subnet: default
     public_ip_name: "{{ azure_vm_vm_prefix }}{{ item }}-pubip"
     security_group: "{{ azure_vm_resource_group }}-nsg"
-  with_sequence: start=1 end={{num_vm|int}}
+  with_sequence: start=1 end={{azure_vm_num_vm|int}}
   async: 1000
   poll: 0
   register: nic
@@ -117,7 +117,7 @@
     network_interfaces: "{{ azure_vm_vm_prefix }}{{ item }}-Nic"
     image: "{{ image }}"
     tags: "{{ azure_vm_tags }}"
-  with_sequence: start=1 end={{num_vm|int}}
+  with_sequence: start=1 end={{azure_vm_num_vm|int}}
   async: 1000
   poll: 0
   register: vm
