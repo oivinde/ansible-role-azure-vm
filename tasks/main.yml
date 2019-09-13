@@ -119,7 +119,7 @@
       - path: "/home/{{ admin_username }}/.ssh/authorized_keys"
         key_data: "{{ ssh_pub_key }}"
     network_interfaces: "{{ azure_vm_vm_prefix }}{{ item }}-Nic"
-    image: "{{ image }}"
+    image: "{{ azure_vm_image }}"
     tags: "{{ azure_vm_tags }}"
   with_sequence: start=1 end={{azure_vm_num_vm|int}}
   async: 1000
