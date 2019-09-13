@@ -4,7 +4,6 @@ azure_vm_resource_group: demo
 azure_vm_location: northeurope
 azure_vm_storage_type: Standard_LRS
 azure_vm_os_disk_type: StandardSSD_LRS
-azure_vm_vm_name: demo-vm
 azure_vm_vm_size: Standard_B1ms
 azure_vm_admin_username: demouser
 azure_vm_ssh_pub_key:
@@ -12,4 +11,4 @@ azure_vm_image: rhel8-golden-image
 azure_vm_vm_prefix: azure
 azure_vm_num_vm: 1
 azure_vm_tags:
-  - env: testing
+  env: testing
