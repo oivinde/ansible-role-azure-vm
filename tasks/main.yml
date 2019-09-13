@@ -59,7 +59,7 @@
 
 - name: Store Public IPs in list
   set_fact:
-    public_ips: "{{ foo }} + [ '{{ item }}' ]"
+    public_ips: "{{ public_ips }} + [ '{{ item }}' ]"
   with_items: "{{ output_ip_address.ansible_facts.azure_publicipaddresses }}"
 
 - name: Create Network Security Group that allows SSH/Cockpit
