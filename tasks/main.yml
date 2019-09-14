@@ -18,7 +18,7 @@
 - name: try to set a unique storageaccount name
   set_fact:
     azure_vm_storageaccount_name: "{{ azure_vm_resource_group }}{{ 10000000 |random}}"
-  when: azure_vm_storageaccount_name|length == 0
+  when: azure_vm_storageaccount_name is undefined
 
 - name: Create a storage account
   azure_rm_storageaccount:
