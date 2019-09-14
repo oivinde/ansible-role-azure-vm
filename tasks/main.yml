@@ -20,7 +20,7 @@
 
 - name: {{ VARIABLE | default('default', true) }}
 set_fact:
-  azure_vm_storageaccount_name: "{{ output_storage_accounts.ansible_facts.storageaccounts[0].name | default({{ azure_vm_resource_group }}{{ 10000000 |random}}, true)"
+  azure_vm_storageaccount_name: "{{ output_storage_accounts.ansible_facts.storageaccounts[0].name | default({{ azure_vm_resource_group }}{{ 10000000 |random}}, true)}}"
 
 - name: Create a storage account
   azure_rm_storageaccount:
