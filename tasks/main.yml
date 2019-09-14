@@ -13,6 +13,7 @@
 - name: set storage_account_name
   set_fact:
     azure_vm_storageaccount_name: "{{ output_storage_accounts.ansible_facts.storageaccounts[0].name }}"
+  when: output_storage_accounts.ansible_facts.storageaccounts[0] is defined
 
 - name: try to set a unique storageaccount name
   set_fact:
