@@ -1,13 +1,22 @@
 ---
 # tasks file for ansible-role-azure-vm
-- name: try to set a unique storageaccount name
-  set_fact:
-    azure_vm_storageaccount_name: "{{ azure_vm_resource_group }}{{ 10000000 |random}}"
-
 - name: Create the resource group
   azure_rm_resourcegroup:
     name: "{{ azure_vm_resource_group }}"
     location: "{{ azure_vm_location }}"
+
+- name: try to set a unique storageaccount name
+  set_fact:
+    azure_vm_storageaccount_name: "{{ azure_vm_resource_group }}{{ 10000000 |random}}"
+
+- name: Check if a storage account excis
+  azure_rm_storageaccount_facts:
+    resource_group: "{{ azure_vm_resource_group }}"
+  register: output_storage_accounts
+
+- name: Show storage account name
+  debug:
+    msg: "{{ output_storage_accounts }}"
 
 - name: Create a storage account
   azure_rm_storageaccount:
