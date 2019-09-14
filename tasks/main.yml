@@ -16,7 +16,7 @@
 
 - name: Show storage account name
   debug:
-    msg: "{{ output_storage_accounts.ansible_facts.storageaccounts[0] }}"
+    msg: "{{ output_storage_accounts.ansible_facts.storageaccounts[0].name }}"
 
 - name: Create a storage account
   azure_rm_storageaccount:
