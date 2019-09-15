@@ -44,7 +44,7 @@
     public_ips: []
 
 - name: Include tasks
-    include: public_ips.yml
+  include: public_ips.yml
   with_sequence: start=1 end={{azure_vm_num_vm|int}}
 
 - name: Create Network Security Group that allows SSH/Cockpit
