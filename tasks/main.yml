@@ -39,43 +39,13 @@
     address_prefix: "10.0.1.0/24"
     virtual_network: "{{ azure_vm_resource_group }}-vnet"
 
-- name: Create public IPs
-  azure_rm_publicipaddress:
-    resource_group: "{{ azure_vm_resource_group }}"
-    allocation_method: Static
-    name: "{{ azure_vm_vm_prefix }}{{ item }}-pubip"
-  with_sequence: start=1 end={{azure_vm_num_vm|int}}
-  async: 1000
-  poll: 0
-  register: publicip
-
-- name: "Check Public IPs Created"
-  async_status:
-    jid: "{{ item.ansible_job_id }}"
-  register: publicip_status
-  until: publicip_status.finished
-  retries: 500
-  delay: 4
-  with_items: "{{ publicip.results }}"
-
-- name: Get facts for all Public IPs
-  azure_rm_publicipaddress_facts:
-    resource_group: "{{ azure_vm_resource_group }}"
-  register: output_ip_address
-
-- name: Show Public IP address
-  debug:
-    msg: "{{ item.properties.ipAddress }}"
-  with_items: "{{ output_ip_address.ansible_facts.azure_publicipaddresses }}"
-
-- name: Initialize an empty list for our Public IPS
+- name: Initialize an empty list to store Public IPs in
   set_fact:
     public_ips: []
 
-- name: Store Public IPs in list
-  set_fact:
-    public_ips: "{{ public_ips }} + [ '{{ item }}' ]"
-  with_items: "{{ output_ip_address.ansible_facts.azure_publicipaddresses }}"
+- name: Include tasks
+    include: public_ips.yml
+  with_sequence: start=1 end={{azure_vm_num_vm|int}}
 
 - name: Create Network Security Group that allows SSH/Cockpit
   azure_rm_securitygroup:

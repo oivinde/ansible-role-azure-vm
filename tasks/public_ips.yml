@@ -1,0 +1,9 @@
+- name: Create public IPs
+  azure_rm_publicipaddress:
+    resource_group: "{{ azure_vm_resource_group }}"
+    allocation_method: Static
+    name: "{{ azure_vm_vm_prefix }}{{ item }}-pubip"
+
+- name: Store Public IPs in list
+  set_fact:
+    public_ips: "{{ public_ips }} + [ '{{ publicip.results[0].state.ip_address }}' ]"
