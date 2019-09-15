@@ -7,4 +7,4 @@
 
 - name: Store Public IPs in list
   set_fact:
-    public_ips: "{{ public_ips }} + [ '{{ publicip.results[0].state.ip_address }}' ]"
+    public_ips: "{{ public_ips }} + [ '{{ publicip.results.state.ip_address }}' ]"
