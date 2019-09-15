@@ -3,6 +3,7 @@
     resource_group: "{{ azure_vm_resource_group }}"
     allocation_method: Static
     name: "{{ azure_vm_vm_prefix }}{{ item }}-pubip"
+  register: publicip
 
 - name: Store Public IPs in list
   set_fact:
