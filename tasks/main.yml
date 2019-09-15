@@ -64,6 +64,12 @@
         access: Allow
         priority: 102
         direction: Inbound
+      - name: POSTGRESQL
+        protocol: Tcp
+        destination_port_range: 5432
+        access: Allow
+        priority: 103
+        direction: Inbound
 
 - name: Create virtual network inteface card
   azure_rm_networkinterface:
